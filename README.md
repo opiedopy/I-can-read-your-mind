@@ -1,4 +1,4 @@
-# I-can-read-your-mind
+# I-can-read-your-mind   (written in Python 3, Thonny)
 A great mind game where you guess correctly someone's chosen number.  
 The code is just a mind assist for you to learn the trick.
 
