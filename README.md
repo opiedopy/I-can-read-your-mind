@@ -14,12 +14,14 @@ The code is just a mind assist for you to learn the trick.
 -  If you are good, you can do the math in your head.
 - 
 -  In your head you do a modulo-9 addition of each number they call out and get a total.
--  The subject's chosen number is (9 - (total modulo 9) or also written (9 - (total%9))
--  Example,   6245123508, scrambled = 2408513652, diff = 3836609856, modulo 9 of total = 0, therefore chosen # = 9
--  Hint for easier modulo total : "All 9's get thrown out" so as the diff numbers are read to you, do this:
--  3...8.(think 11)...3...(think 14)...6 .(think 20 but convert to 2 b/c 20%9 is 2)....6...(think 8)....0 (dismiss)..
+-  
+-  Example,  they pick 6245123508, scrambled = 2408513652, diff = 3836609856
+-  They by their whim choose #9 (non-zero by instruction) from the answer and keep it secret
+-  They read out to you the remainging digits
+-  you, do this:
+-   3...8.(think 11)...3...(think 14)...6 .(think 20 but convert to 2 b/c 20%9 is 2)....6...(think 8)....0 (dismiss)..
 -  ....9 (dismiss)....8....(think 16)......5...(think 21)....6...(think 27 but dismiss since 27%9 = 0)
--  So, you come up with 0, and therefore the subject's chosen # was 9 !   (9 - 0 = )
+-  So, you come up with 0, and therefore the subject's chosen # was 9 !   (total modulo 9)
 -  You have become a mysterious mind reader!
 -  
 -  My python code accepts no input, it is just there to show you what your mind needs to do and the real reason was so that I 
