@@ -1,0 +1,47 @@
+import random
+
+# Generate a random large integer between 1000 and 9999999999
+original_number = random.randint(1000, 9999999999)
+print(f"Original random number: {original_number}")
+
+# Convert the number to a list of its digits
+digit_list = [int(digit) for digit in str(original_number)]
+print(f"Digit list: {digit_list}")
+
+# Create a copy of the digit list and shuffle it
+shuffled_digit_list = digit_list.copy()
+random.shuffle(shuffled_digit_list)
+print(f"Shuffled digit list: {shuffled_digit_list}")
+
+# Convert the shuffled digits back to an integer
+shuffled_number = int("".join(str(digit) for digit in shuffled_digit_list))
+print(f"Shuffled number: {shuffled_number}")
+
+# Calculate the absolute difference between the two numbers
+abs_difference = abs(shuffled_number - original_number)
+print(f"Absolute difference ({shuffled_number} - {original_number}): {abs_difference}")
+
+# Convert the absolute difference to a list of its digits
+difference_digits = [int(digit) for digit in str(abs_difference)]
+print(f"Difference digit list: {difference_digits}")
+
+# Choose a random non-zero digit from the difference digits
+chosen_digit = random.choice(difference_digits)
+while chosen_digit == 0:
+    print(f"Cannot choose {chosen_digit}, picking another...")
+    chosen_digit = random.choice(difference_digits)
+print(f"Chosen digit (non-zero): {chosen_digit}")
+
+# Remove the chosen digit from the difference digits list
+difference_digits.remove(chosen_digit)
+print(f"Difference digits without chosen digit: {difference_digits}")
+
+# Calculate the sum of the remaining digits
+remaining_sum = sum(difference_digits)
+print(f"Sum of remaining digits: {remaining_sum}")
+
+# Calculate the sum modulo 9 and deduce the chosen digit
+sum_mod_9 = remaining_sum % 9
+deduced_digit = 9 - sum_mod_9
+print(f"Sum modulo 9: {sum_mod_9}")
+print(f"Therefore, the chosen digit was: 9 - {sum_mod_9} = {deduced_digit}")
