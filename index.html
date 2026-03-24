@@ -4,982 +4,164 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>I Can Read Your Mind</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --deep: #0a0014;
-    --void: #06000d;
-    --purple: #6b21d6;
-    --violet: #9b4dff;
-    --electric: #c084fc;
-    --gold: #fbbf24;
-    --gold-dim: #d97706;
-    --teal: #2dd4bf;
-    --crimson: #f43f5e;
-    --text: #e8d5ff;
-    --muted: #9f7ec9;
-    --surface: rgba(107,33,214,0.12);
-    --border: rgba(155,77,255,0.3);
-  }
+:root {
+  --deep:#0a0014;
+  --void:#06000d;
+  --purple:#6b21d6;
+  --violet:#9b4dff;
+  --electric:#c084fc;
+  --gold:#fbbf24;
+  --gold-dim:#d97706;
+  --teal:#2dd4bf;
+  --crimson:#f43f5e;
+  --text:#e8d5ff;
+  --muted:#9f7ec9;
+  --border:rgba(155,77,255,0.3);
+}
+
+body{
+  font-family:'Crimson Pro',serif;
+  background:var(--void);
+  color:var(--text);
+  margin:0;
+}
+
+/* layout tighten */
+header{padding:0.9rem 0.8rem 0.25rem;text-align:center;}
+.game-area{padding:0 1rem 0.6rem;}
+.step-card{padding:1rem 1.2rem;max-width:520px;margin:auto;}
+
+/* labels */
+.step-label{
+  font-family:'Cinzel Decorative',cursive;
+  font-size:0.6rem;
+  letter-spacing:0.22em;
+  color:var(--gold);
+}
+
+/* numbers */
+input, .number-echo, .summary-value{
+  font-family:'Space Mono',monospace;
+  font-size:1.25rem;
+  letter-spacing:0.2em;
+}
+
+/* diff digits */
+.diff-digit{
+  cursor:pointer;
+  color:var(--gold);
+  font-family:'Space Mono',monospace;
+  font-size:1.35rem;
+  letter-spacing:0.22em;
+  text-shadow:0 0 6px rgba(251,191,36,0.35);
+}
+
+.diff-digit.zero{
+  color:var(--muted);
+  opacity:0.45;
+  cursor:default;
+  text-shadow:none;
+}
+
+.diff-digit.picked{
+  color:var(--crimson)!important;
+  text-shadow:0 0 12px rgba(244,63,94,0.9);
+}
+
+/* instructions */
+.final-instructions{
+  text-align:center;
+  margin-top:0.65rem;
+  color:#fff;
+  font-size:1.02rem;
+  line-height:1.45;
+}
+
+.final-instructions p{
+  margin-bottom:0.35rem;
+}
+
+/* summary tighten */
+.summary-table{padding:0.45rem 0.8rem;}
+.summary-row{padding:0.25rem 0;display:flex;justify-content:space-between;}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html, body { height: 100%; }
-
-  body {
-    font-family: 'Crimson Pro', Georgia, serif;
-    background: var(--void);
-    color: var(--text);
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.6) 0%, transparent 100%),
-      radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(1.5px 1.5px at 40% 70%, rgba(192,132,252,0.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 65% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1.5px 1.5px at 90% 60%, rgba(251,191,36,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 50% 50%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 30% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(2px 2px at 75% 85%, rgba(192,132,252,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 55% 35%, rgba(255,255,255,0.4) 0%, transparent 100%);
-    pointer-events: none; z-index: 0;
-  }
-
-  body::after {
-    content: '';
-    position: fixed; inset: 0;
-    background:
-      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(107,33,214,0.25) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(155,77,255,0.15) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 30% at 60% 40%, rgba(45,212,191,0.06) 0%, transparent 60%);
-    pointer-events: none; z-index: 0;
-  }
-
-  #app { position: relative; z-index: 1; }
-
-  /* ===== VIEWS ===== */
-  .view { display: none; }
-  .view.active { display: flex; flex-direction: column; }
-
-  /* Main: fixed viewport height, NO scrolling */
-  #view-main {
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  /* Learn: scrolls normally */
-  #view-learn {
-    min-height: 100vh;
-    overflow-y: auto;
-  }
-
-  /* ===== HEADER ===== */
-  header {
-    text-align: center;
-    padding: 1.4rem 1rem 0.4rem;
-    flex-shrink: 0;
-  }
-
-  .eye-container {
-    width: 54px; height: 54px;
-    margin: 0 auto 0.6rem;
-    position: relative;
-    animation: float 4s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-
-  .eye-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 14px rgba(155,77,255,0.8)); }
-
-  h1 {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: clamp(1.15rem, 4vw, 1.9rem);
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--electric) 50%, var(--teal) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.2;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.2rem;
-  }
-
-  .subtitle {
-    font-family: 'Crimson Pro', serif;
-    font-style: italic;
-    font-size: 0.9rem;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-  }
-
-  /* ===== NAV ===== */
-  nav {
-    display: flex;
-    justify-content: center;
-    gap: 0.6rem;
-    padding: 0.4rem 1rem 0.6rem;
-    flex-shrink: 0;
-  }
-
-  .nav-btn {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 0.62rem;
-    letter-spacing: 0.1em;
-    padding: 0.45rem 1.1rem;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--electric);
-    cursor: pointer;
-    transition: all 0.3s;
-    text-transform: uppercase;
-  }
-
-  .nav-btn:hover, .nav-btn.active {
-    background: rgba(155,77,255,0.25);
-    border-color: var(--violet);
-    color: var(--gold);
-    box-shadow: 0 0 16px rgba(155,77,255,0.3);
-    transform: translateY(-1px);
-  }
-
-  /* ===== MAIN GAME — vertically centered, no scroll ===== */
-  .game-area {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 1.5rem 1rem;
-    overflow: hidden;
-  }
-
-  .step-card {
-    background: linear-gradient(135deg, rgba(107,33,214,0.15) 0%, rgba(10,0,20,0.6) 100%);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 1.4rem 1.8rem;
-    width: 100%;
-    max-width: 560px;
-    backdrop-filter: blur(10px);
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-
-  .step-card.visible { opacity: 1; transform: translateY(0); }
-
-  .step-label {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 0.54rem;
-    letter-spacing: 0.2em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 0.45rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .step-label::before {
-    content: '';
-    width: 14px; height: 1px;
-    background: var(--gold-dim);
-    display: inline-block;
-  }
-
-  .hint {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-bottom: 0.6rem;
-    line-height: 1.4;
-  }
-
-  /* ===== ALL THREE NUMBER VALUES share Space Mono 1.2rem ===== */
-  input[type="text"],
-  .number-echo,
-  .summary-value {
-    font-family: 'Space Mono', monospace;
-    font-size: 1.2rem;
-    letter-spacing: 0.18em;
-  }
-
-  input[type="text"] {
-    width: 100%;
-    background: rgba(10,0,20,0.7);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.65rem 1rem;
-    color: var(--teal);
-    outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    caret-color: var(--electric);
-    display: block;
-  }
-
-  input[type="text"]:focus {
-    border-color: var(--violet);
-    box-shadow: 0 0 20px rgba(155,77,255,0.25), inset 0 0 12px rgba(107,33,214,0.1);
-  }
-
-  input[type="text"].error {
-    border-color: var(--crimson);
-    box-shadow: 0 0 16px rgba(244,63,94,0.3);
-    animation: shake 0.4s ease;
-  }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-7px); }
-    40% { transform: translateX(7px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-  }
-
-  .error-msg {
-    color: var(--crimson);
-    font-size: 0.78rem;
-    margin-top: 0.3rem;
-    min-height: 1em;
-    font-style: italic;
-  }
-
-  .btn {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 0.62rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 0.65rem 1.5rem;
-    border-radius: 999px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-top: 0.65rem;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--purple) 0%, var(--violet) 100%);
-    color: white;
-    box-shadow: 0 4px 16px rgba(107,33,214,0.4);
-  }
-
-  .btn-primary:hover {
-    background: linear-gradient(135deg, var(--violet) 0%, var(--electric) 100%);
-    box-shadow: 0 6px 24px rgba(155,77,255,0.5);
-    transform: translateY(-2px);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--electric);
-    border: 1px solid var(--border);
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--electric);
-    background: rgba(155,77,255,0.1);
-    transform: translateY(-1px);
-  }
-
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 0;
-  }
-
-  /* Echo box: same font as inputs but dimmed */
-  .number-echo {
-    color: var(--muted);
-    background: rgba(10,0,20,0.4);
-    border: 1px dashed rgba(155,77,255,0.2);
-    border-radius: 10px;
-    padding: 0.65rem 1rem;
-    margin-bottom: 0.5rem;
-    opacity: 0.75;
-    display: block;
-  }
-
-  /* ===== SUMMARY TABLE ===== */
-  .summary-table {
-    background: rgba(10,0,20,0.5);
-    border-radius: 12px;
-    padding: 0.6rem 1rem;
-    margin-top: 0.4rem;
-  }
-
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.35rem 0;
-  }
-
-  .summary-label {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 0.52rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    width: 82px;
-    flex-shrink: 0;
-  }
-
-  /* All three values: identical font/size — set in the grouped rule above */
-  .summary-value {
-    color: var(--teal);
-    text-align: right;
-    flex: 1;
-  }
-
-  /* Subtracted row: gradient applied only to non-.picked spans */
-  .summary-value.gold-val {
-    background: none; /* gradient goes on individual spans below */
-  }
-
-  .summary-divider {
-    border-top: 1px solid var(--border);
-    margin: 0.25rem 0;
-  }
-
-  /* ===== CLICKABLE DIGITS in difference row ===== */
-  .diff-digit {
-    cursor: pointer;
-    border-radius: 2px;
-    transition: color 0.2s, text-shadow 0.2s;
-    /* Default: gold gradient text */
-    background: linear-gradient(135deg, var(--gold), var(--electric));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .diff-digit.zero {
-    background: none;
-    -webkit-text-fill-color: var(--muted);
-    cursor: default;
-    opacity: 0.5;
-  }
-
-  /* Chosen digit turns crimson */
-  .diff-digit.picked {
-    background: none !important;
-    -webkit-text-fill-color: var(--crimson) !important;
-    text-shadow: 0 0 12px rgba(244,63,94,0.75);
-  }
-
-  .diff-hint {
-    font-size: 0.75rem;
-    color: var(--muted);
-    font-style: italic;
-    margin-top: 0.35rem;
-    text-align: right;
-  }
-
-  /* ===== LEARNING HUB ===== */
-  .learn-area {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 0 1.5rem 4rem;
-  }
-
-  .learn-intro {
-    text-align: center;
-    margin-bottom: 2.5rem;
-  }
-
-  .learn-intro p {
-    font-style: italic;
-    color: var(--muted);
-    font-size: 1.05rem;
-    max-width: 480px;
-    margin: 0 auto;
-    line-height: 1.7;
-  }
-
-  .secret-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
-    color: var(--void);
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    padding: 0.4rem 1rem;
-    border-radius: 999px;
-    margin-bottom: 1rem;
-    text-transform: uppercase;
-  }
-
-  .learn-step {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    opacity: 0;
-    transform: translateX(-20px);
-    transition: all 0.6s ease;
-  }
-
-  .learn-step.visible { opacity: 1; transform: translateX(0); }
-
-  .step-num {
-    flex-shrink: 0;
-    width: 46px; height: 46px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple), var(--violet));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 0.85rem;
-    color: white;
-    box-shadow: 0 4px 15px rgba(107,33,214,0.4);
-    margin-top: 0.2rem;
-  }
-
-  .step-content h4 {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-    color: var(--gold);
-    margin-bottom: 0.5rem;
-  }
-
-  .step-content p {
-    font-size: 1.02rem;
-    color: var(--text);
-    line-height: 1.7;
-  }
-
-  .step-content .code-inline {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.88rem;
-    background: rgba(107,33,214,0.2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.15rem 0.5rem;
-    color: var(--teal);
-  }
-
-  .secret-box {
-    background: linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(107,33,214,0.2) 100%);
-    border: 1px solid rgba(251,191,36,0.4);
-    border-radius: 20px;
-    padding: 2rem;
-    margin: 2.5rem 0;
-    text-align: center;
-  }
-
-  .secret-box h3 {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 1rem;
-    color: var(--gold);
-    margin-bottom: 1rem;
-  }
-
-  .secret-box p {
-    font-size: 1.02rem;
-    color: var(--text);
-    line-height: 1.8;
-    max-width: 520px;
-    margin: 0 auto 1rem;
-  }
-
-  .math-example {
-    background: rgba(10,0,20,0.6);
-    border-radius: 12px;
-    padding: 1.2rem 1.4rem;
-    margin: 1.2rem 0;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--electric);
-    line-height: 1.9;
-    text-align: left;
-    overflow-x: auto;
-  }
-
-  .math-example .comment { color: var(--muted); }
-  .math-example .highlight { color: var(--gold); font-weight: 700; }
-  .math-example .teal { color: var(--teal); }
-
-  .connector { border-top: 1px solid var(--border); margin: 2rem 0; }
-
-  .sparkle {
-    position: absolute;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--gold);
-    animation: sparkle 2s ease-in-out infinite;
-    pointer-events: none;
-  }
-
-  @keyframes sparkle {
-    0%, 100% { opacity: 0; transform: scale(0); }
-    50% { opacity: 1; transform: scale(1); }
-  }
-
-  @media (max-width: 480px) {
-    .step-card { padding: 1rem 1rem; }
-    input[type="text"], .number-echo, .summary-value { font-size: 1rem; letter-spacing: 0.1em; }
-    .learn-step { flex-direction: column; gap: 0.75rem; }
-    .step-num { width: 36px; height: 36px; font-size: 0.7rem; }
-  }
 </style>
 </head>
+
 <body>
-<div id="app">
 
-  <!-- ===== MAIN VIEW — no scroll ===== -->
-  <div class="view active" id="view-main">
-    <header>
-      <div class="eye-container">
-        <div class="sparkle" style="top:-4px;right:4px;animation-delay:0s;"></div>
-        <div class="sparkle" style="top:8px;right:-7px;animation-delay:0.7s;width:4px;height:4px;"></div>
-        <div class="sparkle" style="top:-2px;left:0;animation-delay:1.4s;width:5px;height:5px;"></div>
-        <svg class="eye-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="eyeGrad" cx="50%" cy="50%">
-              <stop offset="0%" stop-color="#c084fc"/>
-              <stop offset="100%" stop-color="#6b21d6"/>
-            </radialGradient>
-            <radialGradient id="pupilGrad" cx="40%" cy="40%">
-              <stop offset="0%" stop-color="#2dd4bf"/>
-              <stop offset="100%" stop-color="#0a0014"/>
-            </radialGradient>
-          </defs>
-          <polygon points="40,5 75,68 5,68" fill="none" stroke="url(#eyeGrad)" stroke-width="2.5" opacity="0.9"/>
-          <ellipse cx="40" cy="44" rx="18" ry="12" fill="url(#eyeGrad)" opacity="0.9"/>
-          <circle cx="40" cy="44" r="7" fill="url(#pupilGrad)"/>
-          <circle cx="40" cy="44" r="4.5" fill="none" stroke="rgba(192,132,252,0.5)" stroke-width="1"/>
-          <circle cx="37" cy="41" r="2" fill="rgba(255,255,255,0.6)"/>
-          <line x1="40" y1="32" x2="40" y2="27" stroke="#c084fc" stroke-width="1.5" opacity="0.5"/>
-          <line x1="40" y1="56" x2="40" y2="61" stroke="#c084fc" stroke-width="1.5" opacity="0.5"/>
-          <line x1="22" y1="44" x2="17" y2="44" stroke="#c084fc" stroke-width="1.5" opacity="0.5"/>
-          <line x1="58" y1="44" x2="63" y2="44" stroke="#c084fc" stroke-width="1.5" opacity="0.5"/>
-        </svg>
-      </div>
-      <h1>I Can Read Your Mind</h1>
-      <p class="subtitle">The Ancient Art of Mathematical Mysticism</p>
-    </header>
+<div class="game-area">
+<div class="step-card">
 
-    <nav>
-      <button class="nav-btn active" onclick="showView('main')">✦ The Trick</button>
-      <button class="nav-btn" onclick="showView('learn')">⚗ Learning Hub</button>
-    </nav>
+<div class="step-label">Line 1 — Your Number</div>
+<input id="input-original" placeholder="enter digits">
 
-    <div class="game-area">
-      <div class="step-card visible" id="main-card">
+<div class="step-label">Line 2 — Scramble</div>
+<input id="input-scrambled" placeholder="same digits, new order">
 
-        <!-- LINE 1 -->
-        <div id="line1-section">
-          <div class="step-label">Line 1 — Your Number</div>
-          <p class="hint">Phone number with area code (10 digits) or any 5–10 digit number. Use varied digits.</p>
-          <input type="text" id="input-original" placeholder="e.g. 6245123508" maxlength="12"
-                 oninput="cleanInput(this)" onkeydown="if(event.key==='Enter') validateStep1()"/>
-          <div class="error-msg" id="err1"></div>
-          <button class="btn btn-primary" id="btn1" onclick="validateStep1()">Next ✦</button>
-        </div>
+<div class="step-label">Result</div>
 
-        <!-- LINE 2 -->
-        <div id="line2-section" style="display:none;">
-          <div class="divider" style="margin-top:1rem;"></div>
-          <div class="step-label" style="margin-top:0.9rem;">Line 2 — Scramble It</div>
-          <p class="hint">Rearrange the exact same digits in any different order.</p>
-          <div class="number-echo" id="echo-original"></div>
-          <input type="text" id="input-scrambled" placeholder="same digits, new order" maxlength="12"
-                 oninput="cleanInput(this)" onkeydown="if(event.key==='Enter') validateStep2()"/>
-          <div class="error-msg" id="err2"></div>
-          <button class="btn btn-primary" id="btn2" onclick="validateStep2()">Subtract ✦</button>
-        </div>
+<div class="summary-table">
+  <div class="summary-row">
+    <span>Original</span>
+    <span id="sum-original"></span>
+  </div>
+  <div class="summary-row">
+    <span>Scrambled</span>
+    <span id="sum-scrambled"></span>
+  </div>
+  <div class="summary-row">
+    <span>Result</span>
+    <span id="sum-result"></span>
+  </div>
+</div>
 
-        <!-- LINE 3 -->
-        <div id="line3-section" style="display:none;">
-          <div class="divider" style="margin-top:1rem;"></div>
-          <div class="step-label" style="margin-top:0.9rem;">Line 3 — The Subtracted Result</div>
+<div class="final-instructions">
+<p>Now, certainly the number is as scrambled as possible.</p>
+<p>Tap (or circle) your favorite digit in the sum to mark your secret choice.</p>
+<p>When the Mind Reader is ready, read the digits out loud — one at a time — skipping your secret digit.</p>
+</div>
 
-          <div class="summary-table">
-            <div class="summary-row">
-              <span class="summary-label">Original</span>
-              <span class="summary-value" id="sum-original"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">Scrambled</span>
-              <span class="summary-value" id="sum-scrambled"></span>
-            </div>
-            <div class="summary-divider"></div>
-            <div class="summary-row">
-              <span class="summary-label">Subtracted</span>
-              <span class="summary-value gold-val" id="sum-result"></span>
-            </div>
-          </div>
-          <div class="diff-hint">Tap any digit in the result to mark your secret choice.</div>
-
-          <p class="hint" style="margin-top:0.6rem; text-align:center;">
-            Subtracting scrambles the digits thoroughly — the result appears random to any observer.
-          </p>
-          <div style="text-align:center; margin-top:0.6rem;">
-            <button class="btn btn-secondary" onclick="resetGame()">✦ Start Over</button>
-          </div>
-        </div>
-
-      </div><!-- /main-card -->
-    </div><!-- /game-area -->
-  </div><!-- /view-main -->
-
-
-  <!-- ===== LEARN VIEW ===== -->
-  <div class="view" id="view-learn">
-    <header>
-      <div class="eye-container">
-        <svg class="eye-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="eyeGrad2" cx="50%" cy="50%">
-              <stop offset="0%" stop-color="#fbbf24"/>
-              <stop offset="100%" stop-color="#d97706"/>
-            </radialGradient>
-          </defs>
-          <polygon points="40,5 75,68 5,68" fill="none" stroke="url(#eyeGrad2)" stroke-width="2.5" opacity="0.9"/>
-          <ellipse cx="40" cy="44" rx="18" ry="12" fill="#d97706" opacity="0.8"/>
-          <circle cx="40" cy="44" r="7" fill="#0a0014"/>
-          <circle cx="40" cy="44" r="4.5" fill="none" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
-          <circle cx="37" cy="41" r="2" fill="rgba(255,255,255,0.6)"/>
-        </svg>
-      </div>
-      <h1>The Learning Hub</h1>
-      <p class="subtitle">Secrets of the Mind Reader revealed</p>
-    </header>
-
-    <nav>
-      <button class="nav-btn" onclick="showView('main')">✦ The Trick</button>
-      <button class="nav-btn active" onclick="showView('learn')">⚗ Learning Hub</button>
-    </nav>
-
-    <div class="learn-area">
-      <div class="learn-intro">
-        <div class="secret-badge">⚗ Classified Knowledge</div>
-        <p>This is the inner sanctum. Here you will learn the mathematical magic that makes this trick work — and how to perform it flawlessly in front of an audience.</p>
-      </div>
-
-      <div class="learn-step" id="ls1">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h4>Set The Stage</h4>
-          <p>Ask someone to choose a large number — ideally their phone number with area code (10 digits). Tell them: <em>"Use lots of different digits, don't repeat the same one all the way through."</em> Have them write it down where you cannot see it, or hide the mobile screen if online.</p>
-        </div>
-      </div>
-
-      <div class="learn-step" id="ls2">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h4>The Scramble</h4>
-          <p>Ask them to <em>rearrange</em> those exact digits in any order they like and write that number below the first. Then subtract the smaller from the larger. All without you seeing anything. If online, the app will do this.</p>
-        </div>
-      </div>
-
-      <div class="learn-step" id="ls3">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h4>Choose A Secret Digit</h4>
-          <p>Ask them to look at the result of the subtraction and <em>mentally</em> select any one non-zero digit from it. They keep this completely secret. They must not show you the paper or screen. If online, they may click on that secret digit and it will highlight.</p>
-        </div>
-      </div>
-
-      <div class="learn-step" id="ls4">
-        <div class="step-num">4</div>
-        <div class="step-content">
-          <h4>They Read You The Rest</h4>
-          <p>Now they read out <em>all the other digits</em> in the result — the ones they did NOT choose — one at a time, slowly, in any order. You listen carefully and do the math in your head.</p>
-        </div>
-      </div>
-
-      <div class="secret-box">
-        <h3>🔮 The Secret: Modulo 9 Magic</h3>
-        <p>When you subtract a number from its scrambled version, the result is <strong>always divisible by 9</strong>. This is the key mathematical truth. The sum of all its digits will be a multiple of 9.</p>
-        <p>So as the subject reads out their digits, you add them up in your head using <em>modulo-9 arithmetic</em>. Whatever you're missing to reach 9 (or 0) — that's their secret digit!</p>
-        <div class="math-example">
-<span class="comment"># Example walkthrough</span>
-Original number:  <span class="teal">6245123508</span>
-Scrambled:        <span class="teal">2408513652</span>
-Subtraction:      <span class="highlight">3836609856</span>   ← subject sees this
-
-Subject secretly picks: <span class="highlight">9</span>
-Subject reads aloud: 3, 8, 3, 6, 6, 0, 8, 5, 6
-
-<span class="comment"># You think in your head:</span>
-3 → 3
-3+8 → 11 → <span class="teal">2</span>  (11 mod 9 = 2)
-2+3 → 5
-5+6 → 11 → <span class="teal">2</span>
-2+6 → 8
-8+0 → 8   (skip 0)
-8+8 → 16 → <span class="teal">7</span>
-7+5 → 12 → <span class="teal">3</span>
-3+6 → 9  → <span class="teal">0</span>  (9 mod 9 = 0)
-
-Running total mod 9: <span class="highlight">0</span>
-Therefore secret digit = <span class="highlight">9</span>  ✓  (0 + 9 = 9, a multiple of 9)
-        </div>
-        <p style="font-size:0.93rem;">The rule: <strong>9 minus your running total = their secret digit.</strong> If your total is already 0, their digit is 9 (since 9 mod 9 = 0).</p>
-      </div>
-
-      <div class="learn-step" id="ls5">
-        <div class="step-num">5</div>
-        <div class="step-content">
-          <h4>The Mental Math Shortcut</h4>
-          <p>Keep a running total. Whenever it hits 9 or above, subtract 9 (or take mod 9). Zeros are irrelevant — skip them entirely. When they're done reading, your answer is: <span class="code-inline">9 - total</span>. If total is 0, say 9.</p>
-        </div>
-      </div>
-
-      <div class="learn-step" id="ls6">
-        <div class="step-num">6</div>
-        <div class="step-content">
-          <h4>The Dramatic Reveal</h4>
-          <p>Close your eyes. Look pensive. Then announce their number with confidence. Practice the mental arithmetic until it's fast. The slower and more theatrical you are, the more magical it appears!</p>
-        </div>
-      </div>
-
-      <div class="connector"></div>
-
-      <div class="learn-step" id="ls7">
-        <div class="step-num">⚠</div>
-        <div class="step-content">
-          <h4>One Edge Case</h4>
-          <p>The trick requires the subject to choose a <em>non-zero</em> digit. If every digit in the result except one is zero, the trick is trivially obvious. Also, if the number uses all identical digits (e.g. 111111), the scrambled version equals the original and the subtraction gives zero — this is why you instruct them to use varied digits.</p>
-        </div>
-      </div>
-
-      <div class="learn-step" id="ls8">
-        <div class="step-num">★</div>
-        <div class="step-content">
-          <h4>Why Does This Work?</h4>
-          <p>Any number and its anagram (rearrangement) have the same digit sum, so they have the same value mod 9. Subtracting them gives a result ≡ 0 (mod 9). This beautiful property of our base-10 number system is what makes the whole trick possible — it's pure mathematics wearing a magician's cape.</p>
-        </div>
-      </div>
-
-      <div class="connector"></div>
-
-      <div class="learn-step" id="ls9">
-        <div class="step-num">+</div>
-        <div class="step-content">
-          <h4>More Examples</h4>
-          <p>Three more worked examples to sharpen your mental arithmetic before performing.</p>
-        </div>
-      </div>
-
-      <div class="secret-box" style="margin-top:0;">
-        <div class="math-example">
-<span class="comment"># Example 1 — 5-digit number</span>
-Original:   <span class="teal">98765</span>
-Scrambled:  <span class="teal">65789</span>
-Difference: <span class="highlight">32976</span>   user secretly picks <span class="highlight">2</span>
-
-Reads aloud: 3, 9, 7, 6
-3 → 3
-3+9 → 12 → <span class="teal">3</span>  (9 mod 9 = 0, no change to running total)
-3+7 → 10 → <span class="teal">1</span>
-1+6 → 7
-
-Running total: <span class="highlight">7</span>   →   9 − 7 = <span class="highlight">2</span>  ✓
-        </div>
-
-        <div class="math-example">
-<span class="comment"># Example 2 — 15-digit number</span>
-Original:   <span class="teal">987655544667788</span>
-Scrambled:  <span class="teal">657896644887755</span>
-Difference: <span class="highlight">329758899780033</span>   user picks second <span class="highlight">7</span>
-
-Reads aloud: 3,2,9,7,5,8,8,9,9,8,0,0,3,3
-3+2 → 5
-5+9 → 14 → <span class="teal">5</span>
-5+7 → 12 → <span class="teal">3</span>
-3+5 → 8
-8+8 → 16 → <span class="teal">7</span>
-7+8 → 15 → <span class="teal">6</span>
-6+9 → 15 → <span class="teal">6</span>  (treat 9s: mod stays same)
-6+9 → 15 → <span class="teal">6</span>
-6+8 → 14 → <span class="teal">5</span>
-5+0+0 → 5  (skip zeros)
-5+3+3 → 11 → <span class="teal">2</span>
-
-Running total: <span class="highlight">2</span>   →   9 − 2 = <span class="highlight">7</span>  ✓
-        </div>
-
-        <div class="math-example">
-<span class="comment"># Example 3 — 6-digit number</span>
-Original:   <span class="teal">108664</span>
-Scrambled:  <span class="teal">866401</span>
-Difference: <span class="highlight">757737</span>   user secretly picks <span class="highlight">5</span>
-
-Reads aloud: 7, 7, 7, 3, 7
-7+7 → 14 → <span class="teal">5</span>
-5+7 → 12 → <span class="teal">3</span>
-3+3 → 6
-6+7 → 13 → <span class="teal">4</span>
-
-Running total: <span class="highlight">4</span>   →   9 − 4 = <span class="highlight">5</span>  ✓
-        </div>
-      </div>
-
-      <div style="text-align:center; padding: 1.5rem 0 2rem;">
-        <button class="btn btn-primary" onclick="showView('main')">✦ Try The Trick</button>
-      </div>
-
-    </div><!-- /learn-area -->
-  </div><!-- /view-learn -->
-
-</div><!-- /app -->
+</div>
+</div>
 
 <script>
-  let originalNum = '';
+let originalNum='';
 
-  function showView(name) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('view-' + name).classList.add('active');
-    document.querySelectorAll('.nav-btn').forEach(b => {
-      if ((name === 'main' && b.textContent.includes('Trick')) ||
-          (name === 'learn' && b.textContent.includes('Hub')))
-        b.classList.add('active');
-    });
-    if (name === 'learn') animateLearning();
-    window.scrollTo(0, 0);
-  }
+document.getElementById('input-original').onchange=e=>{
+  originalNum=e.target.value;
+  document.getElementById('sum-original').textContent=originalNum;
+}
 
-  function cleanInput(el) {
-    el.value = el.value.replace(/\D/g, '');
-  }
+document.getElementById('input-scrambled').onchange=e=>{
+  const val=e.target.value;
+  document.getElementById('sum-scrambled').textContent=val;
 
-  function validateStep1() {
-    const val = document.getElementById('input-original').value.trim();
-    const err = document.getElementById('err1');
-    const input = document.getElementById('input-original');
+  const a=BigInt(originalNum||0);
+  const b=BigInt(val||0);
+  const diff=(a>b?a-b:b-a).toString();
 
-    if (val.length < 5) {
-      err.textContent = 'Please enter at least 5 digits.';
-      input.classList.add('error');
-      setTimeout(() => input.classList.remove('error'), 500);
-      return;
-    }
-    if (new Set(val.split('')).size < 3) {
-      err.textContent = 'Use more varied digits — not all the same!';
-      input.classList.add('error');
-      setTimeout(() => input.classList.remove('error'), 500);
-      return;
+  const resultEl=document.getElementById('sum-result');
+  resultEl.innerHTML='';
+
+  diff.split('').forEach(d=>{
+    const span=document.createElement('span');
+    span.textContent=d;
+
+    if(d==='0'){
+      span.className='diff-digit zero';
+    }else{
+      span.className='diff-digit';
+      span.onclick=()=>span.classList.toggle('picked');
     }
 
-    err.textContent = '';
-    originalNum = val;
-    input.readOnly = true;
-    input.style.color = 'var(--muted)';
-    document.getElementById('btn1').style.display = 'none';
-
-    document.getElementById('echo-original').textContent = val;
-    const line2 = document.getElementById('line2-section');
-    line2.style.display = 'block';
-    line2.style.opacity = '0';
-    line2.style.transform = 'translateY(10px)';
-    requestAnimationFrame(() => {
-      line2.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-      line2.style.opacity = '1';
-      line2.style.transform = 'translateY(0)';
-    });
-    setTimeout(() => document.getElementById('input-scrambled').focus(), 300);
-  }
-
-  function validateStep2() {
-    const val = document.getElementById('input-scrambled').value.trim();
-    const err = document.getElementById('err2');
-    const input = document.getElementById('input-scrambled');
-
-    if (!val) {
-      err.textContent = 'Please enter your scrambled number.';
-      input.classList.add('error');
-      setTimeout(() => input.classList.remove('error'), 500);
-      return;
-    }
-    if (originalNum.split('').sort().join('') !== val.split('').sort().join('')) {
-      err.textContent = 'Use the exact same digits as your original, in a different order.';
-      input.classList.add('error');
-      setTimeout(() => input.classList.remove('error'), 500);
-      return;
-    }
-    if (val === originalNum) {
-      err.textContent = 'Try a truly different arrangement — scramble them more!';
-      input.classList.add('error');
-      setTimeout(() => input.classList.remove('error'), 500);
-      return;
-    }
-
-    err.textContent = '';
-    input.readOnly = true;
-    input.style.color = 'var(--muted)';
-    document.getElementById('btn2').style.display = 'none';
-    document.getElementById('echo-original').style.display = 'none';
-
-    const a = BigInt(originalNum), b = BigInt(val);
-    const diff = (a > b ? a - b : b - a).toString();
-
-    document.getElementById('sum-original').textContent = originalNum;
-    document.getElementById('sum-scrambled').textContent = val;
-
-    // Build diff as clickable spans; each non-zero digit toggles .picked (crimson)
-    const resultEl = document.getElementById('sum-result');
-    resultEl.innerHTML = '';
-    diff.split('').forEach(d => {
-      const span = document.createElement('span');
-      span.textContent = d;
-      if (d === '0') {
-        span.className = 'diff-digit zero';
-      } else {
-        span.className = 'diff-digit';
-        span.addEventListener('click', () => span.classList.toggle('picked'));
-      }
-      resultEl.appendChild(span);
-    });
-
-    const line3 = document.getElementById('line3-section');
-    line3.style.display = 'block';
-    line3.style.opacity = '0';
-    line3.style.transform = 'translateY(10px)';
-    requestAnimationFrame(() => {
-      line3.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-      line3.style.opacity = '1';
-      line3.style.transform = 'translateY(0)';
-    });
-  }
-
-  function resetGame() {
-    originalNum = '';
-    const inp1 = document.getElementById('input-original');
-    inp1.value = ''; inp1.readOnly = false; inp1.style.color = '';
-    document.getElementById('err1').textContent = '';
-    document.getElementById('btn1').style.display = '';
-
-    const inp2 = document.getElementById('input-scrambled');
-    inp2.value = ''; inp2.readOnly = false; inp2.style.color = '';
-    document.getElementById('err2').textContent = '';
-    document.getElementById('btn2').style.display = '';
-    document.getElementById('echo-original').textContent = '';
-    document.getElementById('echo-original').style.display = '';
-
-    document.getElementById('line2-section').style.display = 'none';
-    document.getElementById('line3-section').style.display = 'none';
-    document.getElementById('sum-result').innerHTML = '';
-    document.getElementById('sum-original').textContent = '';
-    document.getElementById('sum-scrambled').textContent = '';
-  }
-
-  function animateLearning() {
-    document.querySelectorAll('.learn-step').forEach((s, i) => {
-      s.classList.remove('visible');
-      setTimeout(() => s.classList.add('visible'), 150 * (i + 1));
-    });
-  }
+    resultEl.appendChild(span);
+  });
+}
 </script>
+
 </body>
 </html>
+
