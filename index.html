@@ -194,7 +194,7 @@
       <div id="line1-section">
         <div class="step-label">Step 1 — Your Number</div>
         <p class="hint">Enter a 5–10 digit number with varied digits.</p>
-        <input type="text" id="input-original" placeholder="e.g. 6245123508" maxlength="12" oninput="cleanInput(this)"/>
+        <input type="text" id="input-original" placeholder="e.g. 6245123508" maxlength="12" oninput="cleanInput(this); clearError('err1')"/>
         <div id="err1" style="color:var(--crimson); font-size:0.7rem; margin-top:0.2rem;"></div>
         <button class="btn btn-primary" id="btn1" onclick="validateStep1()">Next ✦</button>
       </div>
@@ -203,7 +203,7 @@
         <div class="divider"></div>
         <div class="step-label">Step 2 — Scramble It</div>
         <p class="hint">Rearrange those exact same digits in any new order.</p>
-        <input type="text" id="input-scrambled" placeholder="scramble digits" maxlength="12" oninput="cleanInput(this)"/>
+        <input type="text" id="input-scrambled" placeholder="scramble digits" maxlength="12" oninput="cleanInput(this); clearError('err2')"/>
         <div id="err2" style="color:var(--crimson); font-size:0.7rem; margin-top:0.2rem;"></div>
         <button class="btn btn-primary" id="btn2" onclick="validateStep2()">Subtract ✦</button>
       </div>
@@ -234,6 +234,10 @@
 let originalNum = '';
 
 function cleanInput(el) { el.value = el.value.replace(/\D/g, ''); }
+
+function clearError(errorId) {
+  document.getElementById(errorId).textContent = '';
+}
 
 function validateStep1() {
   const val = document.getElementById('input-original').value.trim();
