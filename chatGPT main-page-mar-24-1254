@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Can Read Your Mind</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --deep:#0a0014;
+  --void:#06000d;
+  --purple:#6b21d6;
+  --violet:#9b4dff;
+  --electric:#c084fc;
+  --gold:#fbbf24;
+  --gold-dim:#d97706;
+  --teal:#2dd4bf;
+  --crimson:#f43f5e;
+  --text:#e8d5ff;
+  --muted:#9f7ec9;
+  --border:rgba(155,77,255,0.3);
+}
+
+body{
+  font-family:'Crimson Pro',serif;
+  background:var(--void);
+  color:var(--text);
+  margin:0;
+}
+
+/* layout tighten */
+header{padding:0.9rem 0.8rem 0.25rem;text-align:center;}
+.game-area{padding:0 1rem 0.6rem;}
+.step-card{padding:1rem 1.2rem;max-width:520px;margin:auto;}
+
+/* labels */
+.step-label{
+  font-family:'Cinzel Decorative',cursive;
+  font-size:0.6rem;
+  letter-spacing:0.22em;
+  color:var(--gold);
+}
+
+/* numbers */
+input, .number-echo, .summary-value{
+  font-family:'Space Mono',monospace;
+  font-size:1.25rem;
+  letter-spacing:0.2em;
+}
+
+/* diff digits */
+.diff-digit{
+  cursor:pointer;
+  color:var(--gold);
+  font-family:'Space Mono',monospace;
+  font-size:1.35rem;
+  letter-spacing:0.22em;
+  text-shadow:0 0 6px rgba(251,191,36,0.35);
+}
+
+.diff-digit.zero{
+  color:var(--muted);
+  opacity:0.45;
+  cursor:default;
+  text-shadow:none;
+}
+
+.diff-digit.picked{
+  color:var(--crimson)!important;
+  text-shadow:0 0 12px rgba(244,63,94,0.9);
+}
+
+/* instructions */
+.final-instructions{
+  text-align:center;
+  margin-top:0.65rem;
+  color:#fff;
+  font-size:1.02rem;
+  line-height:1.45;
+}
+
+.final-instructions p{
+  margin-bottom:0.35rem;
+}
+
+/* summary tighten */
+.summary-table{padding:0.45rem 0.8rem;}
+.summary-row{padding:0.25rem 0;display:flex;justify-content:space-between;}
+
+</style>
+</head>
+
+<body>
+
+<div class="game-area">
+<div class="step-card">
+
+<div class="step-label">Line 1 — Your Number</div>
+<input id="input-original" placeholder="enter digits">
+
+<div class="step-label">Line 2 — Scramble</div>
+<input id="input-scrambled" placeholder="same digits, new order">
+
+<div class="step-label">Result</div>
+
+<div class="summary-table">
+  <div class="summary-row">
+    <span>Original</span>
+    <span id="sum-original"></span>
+  </div>
+  <div class="summary-row">
+    <span>Scrambled</span>
+    <span id="sum-scrambled"></span>
+  </div>
+  <div class="summary-row">
+    <span>Result</span>
+    <span id="sum-result"></span>
+  </div>
+</div>
+
+<div class="final-instructions">
+<p>Now, certainly the number is as scrambled as possible.</p>
+<p>Tap (or circle) your favorite digit in the sum to mark your secret choice.</p>
+<p>When the Mind Reader is ready, read the digits out loud — one at a time — skipping your secret digit.</p>
+</div>
+
+</div>
+</div>
+
+<script>
+let originalNum='';
+
+document.getElementById('input-original').onchange=e=>{
+  originalNum=e.target.value;
+  document.getElementById('sum-original').textContent=originalNum;
+}
+
+document.getElementById('input-scrambled').onchange=e=>{
+  const val=e.target.value;
+  document.getElementById('sum-scrambled').textContent=val;
+
+  const a=BigInt(originalNum||0);
+  const b=BigInt(val||0);
+  const diff=(a>b?a-b:b-a).toString();
+
+  const resultEl=document.getElementById('sum-result');
+  resultEl.innerHTML='';
+
+  diff.split('').forEach(d=>{
+    const span=document.createElement('span');
+    span.textContent=d;
+
+    if(d==='0'){
+      span.className='diff-digit zero';
+    }else{
+      span.className='diff-digit';
+      span.onclick=()=>span.classList.toggle('picked');
+    }
+
+    resultEl.appendChild(span);
+  });
+}
+</script>
+
+</body>
+</html>
