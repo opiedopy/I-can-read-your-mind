@@ -144,7 +144,6 @@
     font-size: 0.52rem;
     color: var(--muted);
   }
-  /* Updated Yellow Font - No Gradient */
   .diff-digit {
     cursor: pointer;
     color: var(--solid-yellow);
@@ -155,10 +154,9 @@
     color: var(--crimson) !important;
     text-shadow: 0 0 10px rgba(244,63,94,0.8);
   }
-  /* New Instruction Text Styles */
   .final-instruction {
     color: var(--bright-white);
-    font-size: 0.95rem; /* One size larger than standard hint */
+    font-size: 0.95rem;
     line-height: 1.5;
     text-align: center;
     margin-top: 1rem;
@@ -219,9 +217,9 @@
         </div>
 
         <div class="final-instruction">
-          <p>“Now, certainly the number is as scrambled as possible.</p>
-          <p>Now, tap (or circle, if you are using a pen and paper) your favorite digit in the sum to mark your secret choice.</p>
-          <p>Now, when the Mind Reader is ready, read the digits out loud, one at a time, at the pace they advise, but skip the digit you selected. Try as hard as possible not to think about the secret digit.”</p>
+          <p>Now, certainly the number is as scrambled as possible.</p>
+          <p>Now, tap (or circle, if you are using a pen and paper) your favorite (non-zero) digit in the sum to mark your secret choice.</p>
+          <p>Now, when the Mind Reader is ready, read the (no-zero) digits out loud, one at a time, but skip the digit you selected and do not reveal that number. Try as hard as possible not to think about the secret number!</p>
         </div>
 
         <div style="text-align:center; margin-top:1rem;">
@@ -234,9 +232,7 @@
 
 <script>
 let originalNum = '';
-
 function cleanInput(el) { el.value = el.value.replace(/\D/g, ''); }
-
 function validateStep1() {
   const val = document.getElementById('input-original').value.trim();
   if (val.length < 5) return document.getElementById('err1').textContent = 'Too short.';
@@ -246,7 +242,6 @@ function validateStep1() {
   document.getElementById('line2-section').style.display = 'block';
   document.getElementById('input-scrambled').focus();
 }
-
 function validateStep2() {
   const val = document.getElementById('input-scrambled').value.trim();
   if (originalNum.split('').sort().join('') !== val.split('').sort().join('') || val === originalNum) {
@@ -254,26 +249,24 @@ function validateStep2() {
   }
   document.getElementById('input-scrambled').readOnly = true;
   document.getElementById('btn2').style.display = 'none';
-  
   const a = BigInt(originalNum), b = BigInt(val);
   const diff = (a > b ? a - b : b - a).toString();
-  
   document.getElementById('sum-original').textContent = originalNum;
   document.getElementById('sum-scrambled').textContent = val;
   const resEl = document.getElementById('sum-result');
   resEl.innerHTML = '';
-  
   diff.split('').forEach(d => {
     const span = document.createElement('span');
     span.textContent = d;
     span.className = (d === '0') ? 'diff-digit zero' : 'diff-digit';
-    if (d !== '0') span.onclick = () => span.classList.toggle('picked');
+    if (d !== '0') span.onclick = () => {
+      document.querySelectorAll('.diff-digit').forEach(s => s.classList.remove('picked'));
+      span.classList.add('picked');
+    };
     resEl.appendChild(span);
   });
-  
   document.getElementById('line3-section').style.display = 'block';
 }
-
 function resetGame() { location.reload(); }
 </script>
 </body>
