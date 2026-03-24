@@ -13,6 +13,7 @@
     --violet: #9b4dff;
     --electric: #c084fc;
     --gold: #fbbf24;
+    --gold-light: #fcd34d; /* Lightened one shade */
     --gold-dim: #d97706;
     --teal: #2dd4bf;
     --crimson: #f43f5e;
@@ -92,7 +93,7 @@
   .step-label {
     font-family: 'Cinzel Decorative', cursive;
     font-size: 0.54rem;
-    color: var(--gold);
+    color: var(--gold-light); /* Lightened shade */
     text-transform: uppercase;
     margin-bottom: 0.4rem;
     display: flex;
@@ -101,7 +102,7 @@
   }
   .hint {
     font-size: 0.8rem;
-    color: var(--muted);
+    color: var(--bright-white); /* Changed to white */
     margin-bottom: 0.6rem;
     line-height: 1.3;
   }
@@ -142,7 +143,7 @@
   .summary-label {
     font-family: 'Cinzel Decorative', cursive;
     font-size: 0.52rem;
-    color: var(--muted);
+    color: var(--bright-white); /* Changed to white */
   }
   .diff-digit {
     cursor: pointer;
@@ -217,9 +218,9 @@
         </div>
 
         <div class="final-instruction">
-          <p>Now, certainly the number is as scrambled as possible.</p>
-          <p>Now, tap (or circle, if you are using a pen and paper) your favorite (non-zero) digit in the sum to mark your secret choice.</p>
-          <p>Now, when the Mind Reader is ready, read the (no-zero) digits out loud, one at a time, but skip the digit you selected and do not reveal that number. Try as hard as possible not to think about the secret number!</p>
+          <p>“Now, certainly the number is as scrambled as possible.</p>
+          <p>Now, tap (or circle, if you are using a pen and paper) your favorite digit in the sum to mark your secret choice.</p>
+          <p>Now, when the Mind Reader is ready, read the digits out loud, one at a time, at the pace they advise, but skip the digit you selected. Try as hard as possible not to think about the secret digit.”</p>
         </div>
 
         <div style="text-align:center; margin-top:1rem;">
@@ -232,7 +233,9 @@
 
 <script>
 let originalNum = '';
+
 function cleanInput(el) { el.value = el.value.replace(/\D/g, ''); }
+
 function validateStep1() {
   const val = document.getElementById('input-original').value.trim();
   if (val.length < 5) return document.getElementById('err1').textContent = 'Too short.';
@@ -242,6 +245,7 @@ function validateStep1() {
   document.getElementById('line2-section').style.display = 'block';
   document.getElementById('input-scrambled').focus();
 }
+
 function validateStep2() {
   const val = document.getElementById('input-scrambled').value.trim();
   if (originalNum.split('').sort().join('') !== val.split('').sort().join('') || val === originalNum) {
@@ -249,25 +253,55 @@ function validateStep2() {
   }
   document.getElementById('input-scrambled').readOnly = true;
   document.getElementById('btn2').style.display = 'none';
+  
   const a = BigInt(originalNum), b = BigInt(val);
   const diff = (a > b ? a - b : b - a).toString();
+  
   document.getElementById('sum-original').textContent = originalNum;
   document.getElementById('sum-scrambled').textContent = val;
   const resEl = document.getElementById('sum-result');
   resEl.innerHTML = '';
+  
   diff.split('').forEach(d => {
     const span = document.createElement('span');
     span.textContent = d;
     span.className = (d === '0') ? 'diff-digit zero' : 'diff-digit';
-    if (d !== '0') span.onclick = () => {
-      document.querySelectorAll('.diff-digit').forEach(s => s.classList.remove('picked'));
-      span.classList.add('picked');
-    };
+    if (d !== '0') span.onclick = () => span.classList.toggle('picked');
     resEl.appendChild(span);
   });
+  
   document.getElementById('line3-section').style.display = 'block';
 }
-function resetGame() { location.reload(); }
+
+function resetGame() {
+  // Clear stored values
+  originalNum = '';
+  
+  // Clear and reset inputs
+  const in1 = document.getElementById('input-original');
+  const in2 = document.getElementById('input-scrambled');
+  in1.value = '';
+  in1.readOnly = false;
+  in2.value = '';
+  in2.readOnly = false;
+  
+  // Clear errors
+  document.getElementById('err1').textContent = '';
+  document.getElementById('err2').textContent = '';
+  
+  // Reset visibility
+  document.getElementById('btn1').style.display = 'inline-block';
+  document.getElementById('btn2').style.display = 'inline-block';
+  document.getElementById('line2-section').style.display = 'none';
+  document.getElementById('line3-section').style.display = 'none';
+  
+  // Clear summary values
+  document.getElementById('sum-original').textContent = '';
+  document.getElementById('sum-scrambled').textContent = '';
+  document.getElementById('sum-result').innerHTML = '';
+  
+  in1.focus();
+}
 </script>
 </body>
 </html>
