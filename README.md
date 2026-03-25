@@ -1,29 +1,77 @@
-# I-can-read-your-mind   (written in Python 3, Thonny)
-A great mind game where you guess correctly someone's chosen number.  
-The code is just a mind assist for you to learn the trick.
+# I-can-read-your-mind by Opie Dopy, fuzzywidgetart@gmail.com
+  
+A great mind game where you guess correctly someone's chosen number. This new web based audience-app allows, for the first time ever, the Mind Reader to perform the trick in a darkened hall or room with a small to large audience without having them use paper and pen.  (GitHub is a safe Microsoft repository and no data is collected.)
 
--  OK, ask someone to choose a large number (it works with small numbers too, but not as impressive)
--  Perhaps, ask for a random phone # with area code, so that will give 10 digits.  They need to write it down.
--  Or maybe a 5 or 6 digit number because, as you will see, the subject has to do math on the number.
--  But, tell them to use lots of different digits and not to use all the same digit.
--  Then, ask them to scramble the digits in their number in any order they wish.  Write that number down.
--  They are to subtract the smaller number from the larger number. All without you seeing it.
--  Then ask them to select any one of the non-zero digits in the answer resulting from their subtraction.
--  Then ask them to think of that chosen number.
--  Then ask them to read you each of the other digits, slowly, that they did not select. 
--  If you are good, you can do the math in your head.
-- 
--  In your head you do a modulo-9 addition of each number they call out and get a total.
--  
--  Example,  they pick 6245123508, scrambled = 2408513652, diff = 3836609856
--  They by their whim choose #9 (non-zero by instruction) from the answer and keep it secret
--  They read out to you the remainging digits
--  you, do this:
--   3...8.(think 11)...3...(think 14)...6 .(think 20 but convert to 2 b/c 20%9 is 2)....6...(think 8)....0 (dismiss)..
--  ....9 (dismiss)....8....(think 16)......5...(think 21)....6...(think 27 but dismiss since 27%9 = 0)
--  So, you come up with 0, and therefore the subject's chosen # was 9 !   (total modulo 9)
--  You have become a mysterious mind reader!
--  
--  My python code accepts no input, it is just there to show you what your mind needs to do and the real reason was so that I 
--  could practice Python coding.  I learned alot!   One issue I had was that I wanted to randomly have an initial number between 4 and 10 digits.
--  But, the program produces a 9 or 10 digit # every time.  If anyone can find my error, let me know through github or www.fuzzywidget.com.
+audience webpage link is  https://opiedopy.github.io/I-can-read-your-mind/
+
+Performance:
+
+-  Introduce the app to the room and the audience participants with smart phones may join in the fun by going to the free app.
+- Explain how to work the app by entering a valid number according the the app instructions and then scramble that number in the space below the first number.  A great time to see if audience is sober and in touch. 
+-  Perhaps, ask for a random phone # with area code, so that will give 10 digits. The original number will only be known to the audience member player and the app does not store it.  Or they can enter a fake phone number…. Ha   They need to enter it on their app screen.
+-  Smaller numbers work also, try to keep it from 5 to 10 digits.
+-  Tell them to use lots of different digits and not to use all the same digit.
+-  The app automatically subtracts the smaller of the two numbers from the larger number. Emphasize that you can not see what they are doing.
+- At this point you may have 350 audience members with the sum showing on their app. 
+-  Theatrically, pick a random member of the participating members and ask them to tap to select any one of the non-zero digits in the subtracted sum shown.
+-  Then ask them to read you each of the other digits, slowly, that they did not select. But, tell them to try not to think of their secret number too much to make it harder for the MindReader.
+
+-  With your eyes closed and rubbing your forehead, mentally add each number they read together and then tell them you have seen into their mind and you reveal their number.  See the examples for how the trick works. 
+
+Read mind examples
+------------------------------------------------------------------------------------------------------------------
+Original	9876543
+Scrambled	3456789
+Subtracted	6419754
+
+If #4 chosen:	6419754	Note to MindReader, never count 9.
+The audience member reads their number WITHOUT reading their secret number or zero’s…..
+6+4+1+9(ignore)+7+5=23.  18 is the closest “9” number below 23, and it is “5” digits away, So 9-5=4
+
+If #6 chosen:	6419754   Note to MindReader, never count 9.
+The audience member reads their number WITHOUT reading their secret number or zero’s…..
+4+1+9(ignore)+7+5+4=21.  18 is the closest “9” number below 21, and it is “3” digits away, So 9-3=6
+
+If #7 chosen:	6419754   Note to MindReader, never count 9.
+The audience member reads their number WITHOUT reading their secret number or zero’s…..
+6+4+1+9(ignore)+5+4=20.  18 is the closest “9” number below 20, and it is “2” digits away, So 9-2=7
+------------------------------------------------------------------------------------------------------------------
+Original	6758493021
+Scrambled	4957682013
+Subtracted	1800811008
+
+If #8 chosen:	1800811008   
+The audience member reads their number WITHOUT reading their secret number or zero’s…..
+1+8+1+1+8=19.  18 is the closest “9” number below 19, and it is “1” digits away, So 9-1=8
+------------------------------------------------------------------------------------------------------------------
+Original	827563273595
+Scrambled	286572373955
+Subtracted	540990899640
+
+If #5 chosen:	540990899640 		Note to MindReader, never count 9.
+The audience member reads their number WITHOUT reading their secret number  or zero’s….
+4+9(ignore)+9(ignore)+8+9(ignore)+9(ignore)+6+4=22.  18 is the closest “9” number below 22, and it is “4” digits away, So 9-4=5
+------------------------------------------------------------------------------------------------------------------
+Original	657381689324
+Scrambled	982343875661
+Subtracted	324962186337
+
+If #3 chosen:	324962186337		Note to MindReader, never count 9.
+The audience member reads their number WITHOUT reading their secret number  or zero’s….
+3+2+4+9(ignore)+6+2+1+8+6+3+7=42.  36 is the closest “9” number below 42, and it is “6” digits away, So 9-6=3
+------------------------------------------------------------------------------------------------------------------
+Original	657381689324
+Scrambled	982343875661
+Subtracted	324962186337
+
+If #1 chosen:	324962186337		Note to MindReader, never count 9.
+The audience member reads their number WITHOUT reading their secret number  or zero’s….
+3+2+4+9(ignore)+6+2+8+6+3+3+7=44.  36 is the closest “9” number below 44, and it is “8” digits away, So 9-8=1
+------------------------------------------------------------------------------------------------------------------
+Original 	73915
+Scrambled	19537
+Subtracted	54378
+
+If #5 chosen:	54378	
+The audience member reads their number WITHOUT reading their secret number  or zero’s….	
+4+3+7+8=22. 18 is the closest “9” number below 22, and it is “4” digits away, So 9-4=5
