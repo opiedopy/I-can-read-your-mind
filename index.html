@@ -193,7 +193,7 @@
     <div class="step-card" id="main-card">
       <div id="line1-section">
         <div class="step-label">Step 1 — Your Number</div>
-        <p class="hint">Enter a 5–10 digit number with varied digits.</p>
+        <p class="hint">Enter a 5–12 digit number with varied digits.</p>
         <input type="text" id="input-original" placeholder="e.g. 6245123508" maxlength="12" oninput="cleanInput(this); clearError('err1')"/>
         <div id="err1" style="color:var(--crimson); font-size:0.7rem; margin-top:0.2rem;"></div>
         <button class="btn btn-primary" id="btn1" onclick="validateStep1()">Next ✦</button>
@@ -218,8 +218,8 @@
         </div>
 
         <div class="final-instruction">
-          <p>Certainly the number is as scrambled as possible.</p>
-          <p>Tap (or circle, if you are using a pen and paper) your favorite digit in the sum to mark your secret choice. When the Mind Reader is ready, read the digits out loud, one at a time, at the pace they advise, but skip the digit you selected. Try as hard as possible not to think about the secret digit.</p>
+          <p>Tap your favorite digit above to mark it as your secret choice.</p>
+          <p>Read the <strong>remaining</strong> digits out loud to the Mind Reader. Skip any number 9 entirely as they are invisible to the psychic eye.</p>
         </div>
 
         <div style="text-align:center; margin-top:1rem;">
@@ -269,7 +269,10 @@ function validateStep2() {
     const span = document.createElement('span');
     span.textContent = d;
     span.className = (d === '0') ? 'diff-digit zero' : 'diff-digit';
-    if (d !== '0') span.onclick = () => span.classList.toggle('picked');
+    if (d !== '0') span.onclick = () => {
+        document.querySelectorAll('.diff-digit').forEach(s => s.classList.remove('picked'));
+        span.classList.add('picked');
+    };
     resEl.appendChild(span);
   });
   
